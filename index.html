@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Surprise</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffe6ea;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .heart {
+            position: absolute;
+            font-size: 16px;
+            color: #ff4d6d;
+            opacity: 0.7;
+            animation: float 10s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) scale(0.7) rotate(360deg); opacity: 0; }
+        }
+        .container {
+            text-align: center;
+            background: #fff5f5;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+            transition: opacity 1s ease-in-out;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .pin-display {
+            width: 180px;
+            height: 40px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #d59fa8;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 5px;
+            letter-spacing: 10px;
+        }
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        .numpad button {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            background-color: #d18391;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .numpad button:active {
+            transform: scale(0.9);
+            background-color: #7a2626;
+        }
+        .unlock-button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+        }
+        .error-heart {
+            align-items: center;
+            display: none;
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-55%, -55%) scale(0);
+            font-size: 300px;
+            text-align: center;
+            z-index: 4;
+            animation: popIn 0.7s ease forwards;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4c2323;
+            margin-top: 10px;
+        }
+        #gameCanvas {
+            align-content: center;
+            display: none;
+            border: 2px solid black;
+            background: #e1b5b5;
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .envelope-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translate(-50%, -200%) scale(0.2) rotate(-10deg);
+            animation: envelopeFly 4s ease-in-out forwards;
+            cursor: pointer;
+        }
+        @keyframes envelopeFly {
+            0% { transform: translate(-50%, -200%) scale(0.2) rotate(-15deg); opacity: 0; }
+            20% { transform: translate(-48%, 20vh) scale(0.4) rotate(10deg); opacity: 1; }
+            40% { transform: translate(-52%, 40vh) scale(0.6) rotate(-10deg); }
+            60% { transform: translate(-50%, 60vh) scale(0.8) rotate(5deg); }
+            80% { transform: translate(-50%, 75vh) scale(0.9) rotate(-3deg); }
+            100% { transform: translate(-50%, 50vh) scale(1) rotate(0deg); }
+        }
+        .envelope {
+            width: 300px;
+            height: 220px;
+            background: #f4e1c1;
+            position: relative;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 5px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .envelope-seal {
+            position: absolute;
+            top: 10px;
+            font-size: 30px;
+        }
+        .letter {
+            position: absolute;
+            width: 280px;
+            height: 200px;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 21px;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        .letter p {
+            font-style: italic;
+            font-family: cursive;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+<div class="hearts-container" id="hearts"></div>
+<div class="container" id="pinContainer">
+    <h2>🔒 Enter Secret Code </h2>
+    <div class="pin-display" id="pinDisplay">****</div>
+    <div class="numpad">
+        <button onclick="addDigit(1)">1</button>
+        <button onclick="addDigit(2)">2</button>
+        <button onclick="addDigit(3)">3</button>
+        <button onclick="addDigit(4)">4</button>
+        <button onclick="addDigit(5)">5</button>
+        <button onclick="addDigit(6)">6</button>
+        <button onclick="addDigit(7)">7</button>
+        <button onclick="addDigit(8)">8</button>
+        <button onclick="addDigit(9)">9</button>
+        <button onclick="clearPin()">✖</button>
+        <button onclick="addDigit(0)">0</button>
+        <button onclick="checkPin()">✔</button>
+    </div>
+</div>
+<canvas id="gameCanvas"></canvas>
+<div class='envelope-container' id='envelopeContainer' onclick='openEnvelope()'>
+    <div class='envelope'>
+        <div class='envelope-seal'>❤️</div>
+    </div>
+</div>
+<div class="error-heart" id="errorHeart">
+    💔
+    <div class="error-text">Ех... Треба памятати коли ми поїхали у Швейцарію</div>
+</div><script>
+    let pin = "";
+    function addDigit(digit) {
+        if (pin.length < 4) {
+            pin += digit;
+            updatePinDisplay();
+        }
+    }
+    function clearPin() {
+        pin = "";
+        updatePinDisplay();
+    }
+    function updatePinDisplay() {
+        document.getElementById("pinDisplay").textContent = pin.padEnd(4, '*');
+    }
+    function checkPin() {
+        const correctPin = "0202";
+
+        if (pin === correctPin) {
+            document.getElementById("pinContainer").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("pinContainer").style.display = "none";
+                document.getElementById("gameCanvas").style.display = "block";
+                setTimeout(() => {
+                    document.getElementById("gameCanvas").style.opacity = "1";
+                }, 50);
+                startGame();
+            }, 1000);
+        } else {
+            showError();
+        }
+    }
+
+    function startGame() {
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const tileSize = 19;
+        const gridSize = 19;
+        canvas.width = tileSize * gridSize;
+        canvas.height = tileSize * gridSize;
+        let player = { x: 1, y: 1, moving: false, drawX: 1 * tileSize + tileSize / 2, drawY: 1 * tileSize + tileSize / 2 };
+        let goal = { x: gridSize - 2, y: gridSize - 2 };
+        const maze = Array(gridSize).fill(null).map(() => Array(gridSize).fill(1));
+        function generateMaze(x, y) {
+            maze[y][x] = 0;
+            let directions = [[0, -2], [2, 0], [0, 2], [-2, 0]];
+            directions.sort(() => Math.random() - 0.5);
+            for (let [dx, dy] of directions) {
+                let nx = x + dx, ny = y + dy;
+                if (nx > 0 && ny > 0 && nx < gridSize - 1 && ny < gridSize - 1 && maze[ny][nx] === 1) {
+                    maze[ny - dy / 2][nx - dx / 2] = 0;
+                    generateMaze(nx, ny);
+                }
+            }
+        }
+        generateMaze(1, 1);
+        maze[goal.y][goal.x] = 0;
+        function drawMaze() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    ctx.fillStyle = maze[y][x] === 1 ? "#d8bfd8" : "#ffffff";
+                    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                }
+            }
+            ctx.font = "15px Arial";
+            ctx.fillText("💗", goal.x * tileSize + tileSize / 2 - 10, goal.y * tileSize + tileSize / 2 + 5);
+            ctx.fillText("💓", player.drawX - 10, player.drawY + 5);
+        }
+        document.addEventListener("keydown", (e) => movePlayer(e.key));
+        document.addEventListener("touchstart", handleTouchStart, false);
+        document.addEventListener("touchmove", handleTouchMove, false);
+        let xDown = null, yDown = null;
+
+        function handleTouchStart(evt) {
+            const firstTouch = evt.touches[0];
+            xDown = firstTouch.clientX;
+            yDown = firstTouch.clientY;
+        }
+        function handleTouchMove(evt) {
+            if (!xDown || !yDown) return;
+            let xUp = evt.touches[0].clientX;
+            let yUp = evt.touches[0].clientY;
+            let xDiff = xDown - xUp;
+            let yDiff = yDown - yUp;
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                movePlayer(xDiff > 0 ? "ArrowLeft" : "ArrowRight");
+            } else {
+                movePlayer(yDiff > 0 ? "ArrowUp" : "ArrowDown");
+            }
+            xDown = null;
+            yDown = null;
+        }
+        function movePlayer(direction) {
+            let newX = player.x;
+            let newY = player.y;
+            if (direction === "ArrowUp") newY--;
+            if (direction === "ArrowDown") newY++;
+            if (direction === "ArrowLeft") newX--;
+            if (direction === "ArrowRight") newX++;
+            if (player.x === goal.x && player.y === goal.y) {
+                setTimeout(() => {
+                    document.getElementById("gameCanvas").style.opacity = "0";
+                }, 50);
+                showEnvelope();
+            }
+            if (maze[newY][newX] === 0) {
+                player.moving = true;
+                let steps = 15;
+                let stepX = (newX * tileSize + tileSize / 2 - player.drawX) / steps;
+                let stepY = (newY * tileSize + tileSize / 2 - player.drawY) / steps;
+                let count = 0;
+                function animateMove() {
+                    if (count < steps) {
+                        player.drawX += stepX;
+                        player.drawY += stepY;
+                        drawMaze();
+                        count++;
+                        requestAnimationFrame(animateMove);
+                    } else {
+                        player.x = newX;
+                        player.y = newY;
+                        player.drawX = newX * tileSize + tileSize / 2;
+                        player.drawY = newY * tileSize + tileSize / 2;
+                        player.moving = false;
+                    }
+                }
+                animateMove();
+            }
+        }
+        drawMaze();
+    }
+    function showError() {
+        const errorHeart = document.getElementById("errorHeart");
+        errorHeart.style.display = "flex";
+        errorHeart.style.animation = "popIn 0.7s ease forwards";
+        setTimeout(() => { errorHeart.style.display = "none"; clearPin(); }, 2500);
+    }
+    function createHearts() {
+        const heartsContainer = document.getElementById("hearts");
+        for (let i = 0; i < 50; i++) {
+            let heart = document.createElement("div");
+            heart.classList.add("heart");
+            heart.innerHTML = "❤️";
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = (Math.random() * 5 + 3) + "s";
+            heartsContainer.appendChild(heart);
+        }
+    }
+
+    function showEnvelope() {
+        const envelope = document.getElementById('envelopeContainer');
+        envelope.style.display = 'flex';
+    }
+
+    function openEnvelope() {
+        document.querySelector('.envelope').innerHTML = `
+                <div class='letter' style='display: block;'>
+                    <p>Вітаю тебе з Валентином хахах! 💓  Я дуже радий що ти є у моєму житті. Уже стільки часу пройшло з Швейцарії 🤧.Бажаю тобі Гарного і класного дня сьогодні🫂</p>
+                </div>
+            `;
+    }
+    createHearts();
+</script>
+</body>
+</html>
